@@ -2,16 +2,24 @@
 
 import React from "react";
 import { useState } from "react";
-export default function Add() {
-  const [quantity, setQuantity] = useState(0);
+export default function Add({
+  productId,
+  variantId,
+  stockNumber,
+}: {
+  productId: string;
+  variantId: string;
+  stockNumber: number;
+}) {
+  const [quantity, setQuantity] = useState(1);
 
   //   TEMPORARY
-  const stock = 4;
+  // const stock = 4;
   const handleQuantity = (type: "i" | "d") => {
     if (type === "d" && quantity > 1) {
       setQuantity((prev) => prev - 1);
     }
-    if (type === "i" && quantity < stock) {
+    if (type === "i" && quantity < stockNumber) {
       setQuantity((prev) => prev + 1);
     }
   };
@@ -36,7 +44,7 @@ export default function Add() {
             </button>
           </div>
           <div className="text-xs">
-            Olny <span className="text-orange-500">4 itmes</span>left! <br />
+            Olny <span className="text-orange-500">{stockNumber} itmes</span>left! <br />
             {"Don't"}
             {""}miss it
           </div>

@@ -1,9 +1,15 @@
-import React from "react";
+import React, { Suspense } from "react";
 import Image from "next/image";
 import Fillter from "@/components/Fillter";
 import ProductList from "@/components/ProductList";
+import { wixClientServer } from "@/lib/wixClientServer";
 
-export default function ListPage() {
+const ListPage = async ({ searchParams }: { searchParams: any }) => {
+  const wixClient = await wixClientServer();
+
+  const response = await wixClient.collections.getCollectionBySlug(
+    searchParams.cat || "all-products"
+  );
   return (
     <div className="px-4 md:px-8 lg:px-16 xl:32 2xl:px-64 relative">
       {/* CAMPAING */}
@@ -12,7 +18,9 @@ export default function ListPage() {
           <h1 className="text-4xl font-semibold leading-[48px] text-gray-700">
             Grad up to 50% off on <br /> Selectde Products
           </h1>
-          <button className="rounded-3xl bg-lama text-white w-max py-3 px-5 text-sm">立即購買</button>
+          <button className="rounded-3xl bg-lama text-white w-max py-3 px-5 text-sm">
+            立即購買
+          </button>
         </div>
         <div className="relative w-1/3">
           <Image src="/woman.png" alt="" fill className="object-contain" />
@@ -22,7 +30,10 @@ export default function ListPage() {
       <Fillter />
       {/* 產品清單 */}
       <h1 className="mt-12 text-xl font-semibold">shoes For You!</h1>
-      <ProductList />
+      <Suspense>
+        <ProductList categoryId={response.collection?._id || '00000000-000000-000000-000000000001'} searchParams={searchParams}/>
+      </Suspense>
     </div>
   );
-}
+};
+export default ListPage;
