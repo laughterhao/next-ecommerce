@@ -16,7 +16,7 @@ const SinglePage = async ({ params }: { params: { slug: string } }) => {
   }
 
   const product = products.items[0];
-
+  console.log(product.price?.discountedPrice);
   return (
     <div className="px-4 md:px-8 lg:px-16 xl:32 2xl:px-64 relative flex flex-col lg:flex-row gap-16">
       {/* 圖片 */}
@@ -34,9 +34,14 @@ const SinglePage = async ({ params }: { params: { slug: string } }) => {
               ${product.price?.discountedPrice}
             </h2>
           ) : (
-            <h3 className="text-xl text-gray-500 line-through">
-              ${product.price?.price}
-            </h3>
+            <div className="flex items-center gap-4">
+              <h3 className="text-xl text-gray-500 line-through">
+                ${product.price?.price}
+              </h3>
+              <h2 className="font-medium text-2xl">
+                ${product.price?.discountedPrice}
+              </h2>
+            </div>
           )}
         </div>
         <div className="h-[2px] bg-gray-100" />
