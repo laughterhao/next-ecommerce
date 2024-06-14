@@ -29,7 +29,7 @@ const ListPage = async ({ searchParams }: { searchParams: any }) => {
       {/* 收尋功能 */}
       <Fillter />
       {/* 產品清單 */}
-      <h1 className="mt-12 text-xl font-semibold">shoes For You!</h1>
+      <h1 className="mt-12 text-xl font-semibold">{response?.collection?.name} For You!</h1>
       <Suspense>
         <ProductList categoryId={response.collection?._id || '00000000-000000-000000-000000000001'} searchParams={searchParams}/>
       </Suspense>
