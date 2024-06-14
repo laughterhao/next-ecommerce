@@ -43,11 +43,14 @@ export default function Add({
               +
             </button>
           </div>
-          <div className="text-xs">
-            Olny <span className="text-orange-500">{stockNumber} itmes</span>left! <br />
-            {"Don't"}
-            {""}miss it
-          </div>
+          {stockNumber < 1 ? (
+            <div className="text-xs">Product is Stock</div>
+          ) : (
+            <div className="text-xs">
+              Olny <span className="text-orange-500">{stockNumber} itmes</span> left! <br />
+              {"Don't"} miss it
+            </div>
+          )}
         </div>
         <button className="w-36 text-sm rounded-3xl ring-1 ring-lama text-lama py-2 px-4 hover:bg-lama hover:text-white disabled:cursor-not-allowed disabled:text-white disabled:bg-pink-200 disabled:ring-none">
           加入購物車
