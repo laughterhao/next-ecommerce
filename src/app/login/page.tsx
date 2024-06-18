@@ -14,6 +14,15 @@ import Cookies from "js-cookie";
 import React, { useState } from "react";
 
 export default function LoginPage() {
+  const wixClient = useWixClinet();
+  const router = useRouter();
+
+  const isLoggedIn = wixClient.auth.loggedIn();
+
+  if (isLoggedIn) {
+    router.push("/");
+    //當登入成功時,會轉跳首頁
+  }
   const [mode, setMode] = useState(MODE.LOGIN);
 
   const [username, setUsername] = useState("");
@@ -22,10 +31,9 @@ export default function LoginPage() {
   const [emailCode, setEmailCode] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
-  const [message, setmessage] = useState("");
+  const [message, setMessage] = useState("");
 
   const pathName = usePathname();
-const router = useRouter()
   const fornTitle =
     mode === MODE.LOGIN
       ? "Log in"
@@ -43,7 +51,6 @@ const router = useRouter()
       : mode === MODE.RESET_PASSWORD
       ? "Rest"
       : "Verify";
-  const wixClient = useWixClinet();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -51,7 +58,6 @@ const router = useRouter()
     setError("");
 
     try {
-
       let res;
 
       switch (mode) {
@@ -67,6 +73,7 @@ const router = useRouter()
             password,
             profile: { nickname: username },
           });
+          setMessage("Password reset email sent .Please check your E-mail")
           break;
         case MODE.RESET_PASSWORD:
           res = await wixClient.auth.sendPasswordResetEmail(email, pathName);
@@ -83,20 +90,41 @@ const router = useRouter()
 
       switch (res?.loginState) {
         case LoginState.SUCCESS:
-          setmessage("Sussessful You are being redirected");
-          const tokens =await wixClient.auth.getMemberTokensForDirectLogin(res.data.sessionToken!);
-          
-          console.log(tokens)
+          setMessage("Sussessful You are being redirected");
+          const tokens = await wixClient.auth.getMemberTokensForDirectLogin(
+            res.data.sessionToken!
+          );
 
-          Cookies.set("refreshToken",JSON.stringify(tokens.refreshToken),{
-            expires:2
-          })
+          console.log(tokens);
+
+          Cookies.set("refreshToken", JSON.stringify(tokens.refreshToken), {
+            expires: 2,
+          });
           //把tokens 存入cookies裡
-          wixClient.auth.setTokens(tokens)
+          wixClient.auth.setTokens(tokens);
           //更新tokens
-          router.push("/")
-          //當登入成功時,會轉跳首頁
+
           break;
+        case LoginState.FAILURE:
+          if (
+            res.errorCode === "invalidEmail" ||
+            res.errorCode === "invalidPassword"
+          ) {
+            setError("Invalid Email or Password");
+          } else if (res.errorCode === "emailAlreadyExists") {
+            setError("Email already exists!");
+          } else if (res.errorCode === "resetPassword") {
+            setError("You need to reset your PassWord!");
+          } else {
+            setError("something went wrong!");
+          }
+          break;
+        case LoginState.EMAIL_VERIFICATION_REQUIRED:
+          setMode(MODE.EMAIL_VERIFICATION)
+          case LoginState.OWNER_APPROVAL_REQUIRED:
+          setMessage("You account is pending approval")
+
+          break
         default:
           break;
       }

@@ -3,7 +3,10 @@ import Image from "next/image";
 import React from "react";
 import Menu from "./Menu";
 import SearchBar from "./SearchBar";
-import NavIcons from "./NavIcons";
+import dynamic from "next/dynamic";
+// import NavIcons from "./NavIcons";
+
+const NavIcons = dynamic (()=> import("./NavIcons"),{ssr:false})
 
 export default function Navbar() {
   return (
