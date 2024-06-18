@@ -1,6 +1,6 @@
-import { currentCart } from "@wix/ecom";
 import { OAuthStrategy, createClient } from "@wix/sdk";
 import { collections, products } from "@wix/stores";
+import { currentCart } from "@wix/ecom";
 import { cookies } from "next/headers";
 
 export const wixClientServer = async () => {

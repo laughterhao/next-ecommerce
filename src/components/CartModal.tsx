@@ -4,10 +4,34 @@ import { useCartStore } from "@/hook/useCarStore";
 import Image from "next/image";
 import { media as wixMedia } from "@wix/sdk";
 import { useWixClinet } from "@/hook/useWixClient";
+import { currentCart } from "@wix/ecom";
 
 export default function CartModal() {
   const wixClient = useWixClinet();
   const { cart, isLoading, removeItem } = useCartStore();
+  console.log(cart.lineItems);
+  const hanleCheckout = async () => {
+    try {
+      const checkout =
+        await wixClient.currentCart.createCheckoutFromCurrentCart({
+          channelType: currentCart.ChannelType.WEB,
+        });
+      const { redirectSession } =
+        await wixClient.redirects.createRedirectSession({
+          ecomCheckout: { checkoutId: checkout.checkoutId },
+          callbacks: {
+            postFlowUrl: window.location.origin,
+            thankYouPageUrl: `${window.location.origin}/success`,
+          },
+        });
+
+      if (redirectSession?.fullUrl) {
+        window.location.href = redirectSession.fullUrl;
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  };
 
   return (
     <div className="w-max absolute p-4 rounded-md shadow-[0_3px_10px_rgb(0,0,0,.2)] bg-white top-12 right-0 flex flex-col gap-6 z-20">
@@ -41,7 +65,13 @@ export default function CartModal() {
                         {item.productName?.original}
                       </h3>
                       <div className="p-1 bg-gray-50 rounded-sm flex items-center gap-2">
-                        {item.quantity && item.quantity > 1 && <div className="text-sm text-green-500"> x{item.quantity}</div>}${item.price?.amount}
+                        {item.quantity && item.quantity > 1 && (
+                          <div className="text-sm text-green-500">
+                            {" "}
+                            x{item.quantity}
+                          </div>
+                        )}
+                        ${item.price?.amount}
                       </div>
                     </div>
                     {/* 描述 */}
@@ -68,7 +98,11 @@ export default function CartModal() {
           <div className="">
             <div className="flex items-center justify-between font-semibold">
               <span className="">總金額</span>
-              <span className="">${cart.subtotal.amount}</span>
+              {cart.lineItems?.reduce(
+                (total: number, item) =>
+                  total + Number(item.fullPrice?.amount || 0),
+                0
+              )}
             </div>
             <p className="text-gray-500 text-sm mt-2 mb-4">
               Lorem ipsum dolor sit, amet consectetur .
@@ -77,7 +111,11 @@ export default function CartModal() {
               <button className="rounded-md py-3 px-4 ring-1 ring-gray-300 ">
                 購物車內容
               </button>
-              <button className="rounded-md py-3 px-4 bg-black text-white disabled:cursor-not-allowed disabled::opacity-75" disabled={isLoading}>
+              <button
+                className="rounded-md py-3 px-4 bg-black text-white disabled:cursor-not-allowed disabled::opacity-75"
+                disabled={isLoading}
+                onClick={hanleCheckout}
+              >
                 結帳
               </button>
             </div>
