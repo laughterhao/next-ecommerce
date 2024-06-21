@@ -1,12 +1,10 @@
 // "use client";
 
-import React, { Suspense, useContext, useEffect } from "react";
+import React, { Suspense } from "react";
 import Slider from "@/components/Slider";
 import Product from "@/components/ProductList";
 import CategoryList from "@/components/CategoryList";
-import { WixClientContext } from "@/context/wixContext";
-import { useWixClinet } from "@/hook/useWixClient";
-import { wixClientServer } from "@/lib/wixClientServer";
+import Skeleton from "@/components/Skeleton";
 
 const HomePage = async () => {
   // const wixClient = useWixClinet()
@@ -28,7 +26,7 @@ const HomePage = async () => {
       <Slider />
       <div className="mt-24 px-4 md:px-8 lg:px-16 xl:32 2xl:px-64">
         <h1 className="text-2xl">Featured Products</h1>
-        <Suspense fallback={"loading"}>
+        <Suspense fallback={<Skeleton />}>
           <Product
             categoryId={process.env.FEATURED_PRODUCTS_CATEGORY_ID!}
             limit={4}
@@ -45,7 +43,12 @@ const HomePage = async () => {
       </div>
       <div className="mt-24 px-4 md:px-8 lg:px-16 xl:32 2xl:px-64">
         <h1 className="text-2xl">New Products</h1>
-        {/* <Product /> */}
+        <Suspense fallback={<Skeleton />}>
+          <Product
+            categoryId={process.env.FEATURED_PRODUCTS_CATEGORY_ID!}
+            limit={4}
+          />
+        </Suspense>
       </div>
     </div>
   );
